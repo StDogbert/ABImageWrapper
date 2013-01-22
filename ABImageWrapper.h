@@ -1,10 +1,6 @@
 //
 //  ABImageWrapper.h
-//  Jeremy
-//
 //  Created by Alexandr Barenboim on 18.01.13.
-//  Copyright (c) 2013 GPIHolding. All rights reserved.
-//
 
 #define MAXIMUM_ABImage_QUALITY 1.0
 

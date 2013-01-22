@@ -1,10 +1,6 @@
 //
 //  ABImageWrapper.m
-//  Jeremy
-//
 //  Created by Alexandr Barenboim on 18.01.13.
-//  Copyright (c) 2013 GPIHolding. All rights reserved.
-//
 
 #import "ABImageWrapper.h"
 
