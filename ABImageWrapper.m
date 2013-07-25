@@ -79,6 +79,7 @@ const float default_quality = 0.5;
 - (id)initWithCacheID:(NSString*)cache_id
 {
     if (self = [self init]) {
+        uuid_string = cache_id;
         UIImage* image = [self getUIImageFromCache:cache_id];
         
         [self fillWithImage:image];
