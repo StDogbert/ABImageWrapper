@@ -7,6 +7,10 @@
 
 + (id)createWithUIImage:(UIImage*)image;
 
++ (id)createWithCacheID:(NSString*)cache_id;
+
+- (id)initWithCacheID:(NSString*)cache_id;
+
 - (id)initWithUIImage:(UIImage*)image;
 
 - (UIImage*)fullSized;
@@ -26,5 +30,7 @@
 - (UIImage*)customSize:(CGSize)size withQuality:(float)quality;
 
 - (NSString*)fileName;
+
+- (NSString*)cacheForReuse;
 
 @end
