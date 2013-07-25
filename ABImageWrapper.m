@@ -1,11 +1,10 @@
-//
 //  ABImageWrapper.m
 //  Created by Alexandr Barenboim on 18.01.13.
 
 #import "ABImageWrapper.h"
 
 #define TEMPORARY_AB_IMAGES @"TemporaryABImages"
-#define SMALL_WIDTH 40.0
+#define SMALL_WIDTH 70.0
 #define MEDIUM_WIDTH 200.0
 
 static int counter = 0;
@@ -65,8 +64,14 @@ const float default_quality = 0.5;
         
         
         NSString* root_path = [[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent];
-
+        
         tmp_folder_path = [NSTemporaryDirectory() stringByAppendingPathComponent:TEMPORARY_AB_IMAGES];
+        
+        NSRange occurence = [tmp_folder_path rangeOfString:@"/private"];
+        
+        if (occurence.location == 0) {
+            tmp_folder_path = [tmp_folder_path substringFromIndex:occurence.length];
+        }
         
         tmp_folder_path = [tmp_folder_path stringByReplacingOccurrencesOfString:root_path withString:@".."];
         
@@ -89,7 +94,7 @@ const float default_quality = 0.5;
         
         NSData* full_sized_image_data = UIImageJPEGRepresentation(image, MAXIMUM_ABImage_QUALITY);;
         
-        [full_sized_image_data writeToFile:full_sized_file_name atomically:NO];
+        [full_sized_image_data writeToFile:full_sized_file_name atomically:YES];
     }
     
     return self;
@@ -165,6 +170,15 @@ const float default_quality = 0.5;
 - (NSString*)fileNameWithSize:(CGSize)size andQuality:(float)quality
 {
     return [NSString stringWithFormat:@"id-%dwidth-%fheight-%fquality-%f.jpg", uniquie_id, size.width, size.height, quality];
+}
+
+- (NSString*)fileName
+{
+    NSLog(@"file size: %d", [UIImageJPEGRepresentation([self smallSizeWithQuality:0.001], 0.001) length]);
+    
+    CGSize smallSize = CGSizeMake(small_width, small_width * full_Size.height / full_Size.width);
+    
+    return [self fileNameWithSize:smallSize andQuality:default_quality];
 }
 
 @end

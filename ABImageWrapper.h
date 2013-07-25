@@ -1,4 +1,3 @@
-//
 //  ABImageWrapper.h
 //  Created by Alexandr Barenboim on 18.01.13.
 
@@ -25,5 +24,7 @@
 - (UIImage*)customSize:(CGSize)size;
 
 - (UIImage*)customSize:(CGSize)size withQuality:(float)quality;
+
+- (NSString*)fileName;
 
 @end
