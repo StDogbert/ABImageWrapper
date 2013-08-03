@@ -29,9 +29,10 @@
     
     self.background_photo = [[UIImageView alloc] initWithFrame:self.bounds];
     [self.background_photo setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
-    self.background_photo.contentMode = UIViewContentModeScaleAspectFill;
     self.background_photo.clipsToBounds = YES;
     [self.backgroundView addSubview:self.background_photo];
+    
+    [self setImage:Nil];
 }
 
 - (id)initWithFrame:(CGRect)frame
@@ -54,7 +55,14 @@
 
 - (void)setImage:(UIImage*)image
 {
+    self.background_photo.contentMode = UIViewContentModeScaleAspectFill;
+    
     self.background_photo.image = image;
+    
+    if (!image) {
+        self.background_photo.image = [UIImage imageNamed:@"camera.png"];
+        self.background_photo.contentMode = UIViewContentModeScaleAspectFit;
+    }
 }
 
 @end

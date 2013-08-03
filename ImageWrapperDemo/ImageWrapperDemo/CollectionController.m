@@ -12,6 +12,8 @@
 #import "ABImageWrapper.h"
 #import "DataModel.h"
 
+#define CELLS_NUMBER 30
+
 UIViewController* getViewControllerWithID(NSString* controller_id)
 {
     UIStoryboard* mainStoryboard;
@@ -78,10 +80,38 @@ UIViewController* getViewControllerWithID(NSString* controller_id)
     }
 }
 
+- (IBAction)fill:(id)sender
+{
+    [self performSelectorInBackground:@selector(fillInBackground) withObject:Nil];
+}
+
+- (void)fillInBackground
+{
+    @autoreleasepool {
+        for (int i = 0; i < [self.collection numberOfItemsInSection:0]; i++) {
+            NSIndexPath* path = [NSIndexPath indexPathForItem:i inSection:0];
+            NSString* key = keyForIndexPath(path);
+            
+            ABImageWrapper* wrapper;
+            
+            if (![dataModel() valueForKey:key]) {
+                NSString* image_name = [NSString stringWithFormat:@"nature%d.jpg", ((i+1)%15)+1];
+                UIImage* image = [UIImage imageNamed:image_name];
+                wrapper = [ABImageWrapper createWithUIImage:image];
+            }
+            
+            if (![dataModel() valueForKey:key]) {
+                [dataModel() setValue:wrapper forKey:key];
+                [self.collection performSelectorOnMainThread:@selector(reloadItemsAtIndexPaths:) withObject:@[path] waitUntilDone:NO];
+            }
+        }
+    }
+}
+
 #pragma mark - UICollectionView Datasource
 - (NSInteger)collectionView:(UICollectionView *)view numberOfItemsInSection:(NSInteger)section
 {
-    return dataModel().count;
+    return CELLS_NUMBER;
 }
 
 - (NSInteger)numberOfSectionsInCollectionView: (UICollectionView *)collectionView
@@ -138,12 +168,12 @@ UIViewController* getViewControllerWithID(NSString* controller_id)
 
 #pragma mark – UICollectionViewDelegateFlowLayout
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    return CGSizeMake(130, 130);
+    return CGSizeMake(135, 135);
 }
 
 - (UIEdgeInsets)collectionView:
 (UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-    return UIEdgeInsetsMake(10, 20, 10, 20);
+    return UIEdgeInsetsMake(30, 10, 30, 10);
 }
 
 #pragma mark - # UIImagePicker Controller delegate

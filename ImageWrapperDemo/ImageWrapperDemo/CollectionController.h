@@ -12,4 +12,6 @@
 
 @property (weak, nonatomic) IBOutlet UICollectionView *collection;
 
+- (IBAction)fill:(id)sender;
+
 @end
