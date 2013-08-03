@@ -2,9 +2,9 @@
 //  CollectionController.m
 //  ImageWrapperDemo
 //
-//  Created by Alexandr Barenboim on 03.08.13.
-//  Copyright (c) 2013 Alexandr Barenboym. All rights reserved.
-//
+//  Created by Alexandr Barenboym on 03.08.13.
+//  Copyright (c) 2013 Alexandr Barenboym. 
+//  See the file license.txt for copying permission.
 
 #import "CollectionController.h"
 #import "Cell.h"

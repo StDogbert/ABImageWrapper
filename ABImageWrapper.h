@@ -1,5 +1,5 @@
 //  ABImageWrapper.h
-//  Created by Alexandr Barenboim on 18.01.13.
+//  Created by Alexandr Barenboym on 18.01.13.
 
 #define MAXIMUM_ABImage_QUALITY 1.0
 #define SMALL_ABWIDTH 70.0

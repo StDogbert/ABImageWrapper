@@ -1,5 +1,5 @@
 //  ABImageWrapper.m
-//  Created by Alexandr Barenboim on 18.01.13.
+//  Created by Alexandr Barenboym on 18.01.13.
 
 #import "ABImageWrapper.h"
 #include <stdio.h>
