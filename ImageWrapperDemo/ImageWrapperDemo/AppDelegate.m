@@ -9,10 +9,6 @@
 #import "AppDelegate.h"
 #import <sys/param.h>
 
-#import "ABImageWrapper.h"
-
-static ABImageWrapper* wrapper;
-
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions

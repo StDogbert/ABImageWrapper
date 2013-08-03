@@ -158,8 +158,6 @@ const float default_quality = 0.5;
 }
 
 - (void)dealloc {
-    NSFileManager* filemanager = [NSFileManager defaultManager];
-    [filemanager removeItemAtPath:tmp_folder_path error:Nil];
 }
 
 - (UIImage*)fullSized {
@@ -224,7 +222,9 @@ const float default_quality = 0.5;
     
     NSString* relative_file_path = [self filePathWithSize:size andQuality:quality relative:YES];
     
-    return [UIImage imageNamed:relative_file_path];
+    UIImage* response_image = [UIImage imageNamed:relative_file_path];
+    
+    return response_image;
 }
 
 - (NSString*)fileNameWithSize:(CGSize)size andQuality:(float)quality
@@ -320,11 +320,18 @@ const float default_quality = 0.5;
     return uuid_str;
 }
 
-- (void)clearTmp
+- (void)clearTmp:(BOOL)including_initial_image
 {
-    NSString* full_sized_file_name = [self fileNameWithSize:full_Size andQuality:MAXIMUM_ABImage_QUALITY];
-    
     NSFileManager* filemanager = [NSFileManager defaultManager];
+    
+    if (including_initial_image) {
+        
+        [filemanager removeItemAtPath:tmp_folder_path error:Nil];
+        
+        return;
+    }
+    
+    NSString* full_sized_file_name = [self fileNameWithSize:full_Size andQuality:MAXIMUM_ABImage_QUALITY];
     NSDirectoryEnumerator* en = [filemanager enumeratorAtPath:tmp_folder_path];
     NSString* file;
     while (file = [en nextObject]) {
@@ -334,6 +341,30 @@ const float default_quality = 0.5;
         
         [filemanager removeItemAtPath:[tmp_folder_path stringByAppendingPathComponent:file] error:Nil];
     }
+}
+
++ (void)clearAllTmpFoldersAndFiles
+{
+    NSFileManager* filemanager = [NSFileManager defaultManager];
+    
+    NSArray* paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString* tmp_folder_directory = [paths lastObject];
+    
+    tmp_folder_directory = [tmp_folder_directory stringByAppendingPathComponent:TEMPORARY_AB_IMAGES];
+    
+    [filemanager removeItemAtPath:tmp_folder_directory error:Nil];
+}
+
++ (void)clearAllCachedFiles
+{
+    NSFileManager* filemanager = [NSFileManager defaultManager];
+    
+    NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString* documents_directory = [paths lastObject];
+    
+    documents_directory = [documents_directory stringByAppendingPathComponent:CACHED_AB_IMAGES];
+    
+    [filemanager removeItemAtPath:documents_directory error:Nil];
 }
 
 @end

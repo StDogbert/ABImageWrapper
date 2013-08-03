@@ -93,10 +93,10 @@ UIViewController* getViewControllerWithID(NSString* controller_id)
 {
     NSString* identifier = @"cell";
     Cell *cell = [cv dequeueReusableCellWithReuseIdentifier:identifier forIndexPath:indexPath];
-//    NSString* image_name = [NSString stringWithFormat:@"nature%d.jpg", indexPath.row%4+1];
-//    UIImage* image = [UIImage imageNamed:image_name];
-//    ABImageWrapper* wrapper = [ABImageWrapper createWithUIImage:image];
-//    [cell setImage:wrapper];
+    NSString* image_name = [NSString stringWithFormat:@"nature%d.jpg", indexPath.row%4+1];
+    UIImage* image = [UIImage imageNamed:image_name];
+    ABImageWrapper* wrapper = [ABImageWrapper createWithUIImage:image];
+    [cell setImage:wrapper];
     
     return cell;
 }

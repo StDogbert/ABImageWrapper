@@ -54,7 +54,7 @@
 
 - (void)setImage:(ABImageWrapper*)wrapper
 {
-    self.background_photo.image = [wrapper smallSize];
+    self.background_photo.image = [wrapper mediumSize];
 }
 
 @end
