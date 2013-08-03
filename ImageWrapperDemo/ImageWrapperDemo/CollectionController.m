@@ -36,6 +36,7 @@ UIViewController* getViewControllerWithID(NSString* controller_id)
 @interface CollectionController ()
 {
     NSMutableArray* data_source_images;
+    BOOL fill_in_process;
 }
 
 @end
@@ -46,6 +47,8 @@ UIViewController* getViewControllerWithID(NSString* controller_id)
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
+    
+    fill_in_process = NO;
     
     [self.collection registerClass:[Cell class] forCellWithReuseIdentifier:@"cell"];
 }
@@ -82,12 +85,18 @@ UIViewController* getViewControllerWithID(NSString* controller_id)
 
 - (IBAction)fill:(id)sender
 {
+    if (fill_in_process) {
+        return;
+    }
+    
     [self performSelectorInBackground:@selector(fillInBackground) withObject:Nil];
 }
 
 - (void)fillInBackground
 {
     @autoreleasepool {
+        fill_in_process = YES;
+        
         for (int i = 0; i < [self.collection numberOfItemsInSection:0]; i++) {
             NSIndexPath* path = [NSIndexPath indexPathForItem:i inSection:0];
             NSString* key = keyForIndexPath(path);
@@ -105,6 +114,8 @@ UIViewController* getViewControllerWithID(NSString* controller_id)
                 [self.collection performSelectorOnMainThread:@selector(reloadItemsAtIndexPaths:) withObject:@[path] waitUntilDone:NO];
             }
         }
+        
+        fill_in_process = NO;
     }
 }
 
