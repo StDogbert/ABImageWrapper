@@ -81,7 +81,7 @@ UIViewController* getViewControllerWithID(NSString* controller_id)
 #pragma mark - UICollectionView Datasource
 - (NSInteger)collectionView:(UICollectionView *)view numberOfItemsInSection:(NSInteger)section
 {
-    return 50;
+    return dataModel().count;
 }
 
 - (NSInteger)numberOfSectionsInCollectionView: (UICollectionView *)collectionView
@@ -138,7 +138,7 @@ UIViewController* getViewControllerWithID(NSString* controller_id)
 
 #pragma mark – UICollectionViewDelegateFlowLayout
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    return CGSizeMake(60, 60);
+    return CGSizeMake(130, 130);
 }
 
 - (UIEdgeInsets)collectionView:
