@@ -1,3 +1,5 @@
+MIT License
+
 ABImageWrapper designed to handle image temporary caching. In case when you need to manage multiple UIImages which can't be loaded in memory all at once wrapper will store them in temporary directory. Wrapper object itself will handle only file pathes and load them when you need it. Because imageNamed method used in wrapper caches UIImages and clear them automatically on low memory warnings you don't need to take any aditional measures. Also wrapper can scale images and cache them for reuses between application launching in case your network server support this approach.
 
 For example you can use ABImageWrapper when you provide user option to take from camera or choose from album multiple photos which will be later uploaded to server. Full sized photos can deplete all available memory very fast. In this case usualy you need to store them in some temporary directory and handle memory warning urself. Wrapper will make it a lot easyer.
