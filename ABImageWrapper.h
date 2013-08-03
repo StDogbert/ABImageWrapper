@@ -33,8 +33,6 @@
 
 - (UIImage*)customSize:(CGSize)size withQuality:(float)quality;
 
-- (NSString*)fileName;
-
 - (NSString*)cacheForReuse;
 
 - (void)removeFromCache;

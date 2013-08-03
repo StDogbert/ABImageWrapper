@@ -2,6 +2,7 @@
 //  Created by Alexandr Barenboim on 18.01.13.
 
 #import "ABImageWrapper.h"
+#include <stdio.h>
 
 #define TEMPORARY_AB_IMAGES @"TemporaryABImages"
 #define CACHED_AB_IMAGES @"CachedABImages"
@@ -107,34 +108,32 @@ const float default_quality = 0.5;
     small_width = MIN(SMALL_ABWIDTH, full_Size.width);
     medium_width = MIN(MEDIUM_ABWIDTH, full_Size.width);
     
-    NSString* full_sized_file_name = [tmp_folder_path stringByAppendingPathComponent:[self fileNameWithSize:full_Size andQuality:MAXIMUM_ABImage_QUALITY]];
+    NSString* full_sized_file_path = [self filePathWithSize:full_Size andQuality:MAXIMUM_ABImage_QUALITY relative:NO];
     
-    NSData* full_sized_image_data = UIImageJPEGRepresentation(image, MAXIMUM_ABImage_QUALITY);;
+    NSData* full_sized_image_data = UIImageJPEGRepresentation(image, MAXIMUM_ABImage_QUALITY);
     
-    [full_sized_image_data writeToFile:full_sized_file_name atomically:YES];
+    [[NSFileManager defaultManager] createFileAtPath:full_sized_file_path
+                                            contents:nil attributes:nil];
+    
+    [full_sized_image_data writeToFile:full_sized_file_path atomically:YES];
 }
 
 - (void)prepareTmpFolderPath
 {
-    NSString* root_path = [[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent];
+    NSArray* paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString* tmp_folder_directory = [paths lastObject];
     
-    tmp_folder_path = [NSTemporaryDirectory() stringByAppendingPathComponent:TEMPORARY_AB_IMAGES];
-    
-    NSRange occurence = [tmp_folder_path rangeOfString:@"/private"];
-    
-    if (occurence.location == 0) {
-        tmp_folder_path = [tmp_folder_path substringFromIndex:occurence.length];
-    }
-    
-    tmp_folder_path = [tmp_folder_path stringByReplacingOccurrencesOfString:root_path withString:@".."];
+    tmp_folder_path = [tmp_folder_directory stringByAppendingPathComponent:TEMPORARY_AB_IMAGES];
     
     NSFileManager* filemanager = [NSFileManager defaultManager];
     
     static BOOL first_time = YES;
     
+    NSError *error = Nil;
+    
     if (first_time) {
-        [filemanager removeItemAtPath:tmp_folder_path error:Nil];
-        [filemanager createDirectoryAtPath:tmp_folder_path withIntermediateDirectories:YES attributes:Nil error:Nil];
+        [filemanager removeItemAtPath:tmp_folder_path error:&error];
+        [filemanager createDirectoryAtPath:tmp_folder_path withIntermediateDirectories:YES attributes:Nil error:&error];
         first_time = NO;
     }
     
@@ -146,14 +145,10 @@ const float default_quality = 0.5;
 
 - (void)prepareCachedFolderPath
 {
-    NSString* root_path = [[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent];
-    
     NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString* documents_directory = [paths objectAtIndex:0];
+    NSString* documents_directory = [paths lastObject];
     
     cached_folder_path = [documents_directory stringByAppendingPathComponent:CACHED_AB_IMAGES];
-    
-    cached_folder_path = [cached_folder_path stringByReplacingOccurrencesOfString:root_path withString:@".."];
     
     NSFileManager* filemanager = [NSFileManager defaultManager];
     
@@ -202,31 +197,34 @@ const float default_quality = 0.5;
 
 - (UIImage*)customSize:(CGSize)size withQuality:(float)quality
 {
-    NSString* file_name = [self fileNameWithSize:size andQuality:quality];
-    file_name = [tmp_folder_path stringByAppendingPathComponent:file_name];
+    NSString* file_path = [self filePathWithSize:size andQuality:quality relative:NO];
     
     NSFileManager* filemanager = [NSFileManager defaultManager];
     
-    BOOL file_exists = [filemanager fileExistsAtPath:file_name];
+    BOOL file_exists = [filemanager fileExistsAtPath:file_path];
     
     if (!file_exists) {
-        NSString* full_sized_image_name = [tmp_folder_path stringByAppendingPathComponent:[self fileNameWithSize:full_Size andQuality:MAXIMUM_ABImage_QUALITY]];
+        NSString* relative_full_sized_file_path = [self filePathWithSize:full_Size andQuality:MAXIMUM_ABImage_QUALITY relative:YES];
         
-        UIImage* full_sized_image = [UIImage imageNamed:full_sized_image_name];
+        UIImage* full_sized_image = [UIImage imageNamed:relative_full_sized_file_path];
         
         if (!full_sized_image) {
             return Nil;
         }
-
         
         UIImage* scaled_image = [self scaleToSize:size image:full_sized_image];
         
         NSData* scaled_image_data = UIImageJPEGRepresentation(scaled_image, quality);
         
-        [scaled_image_data writeToFile:file_name atomically:YES];
+        [[NSFileManager defaultManager] createFileAtPath:file_path
+                                                contents:nil attributes:nil];
+        
+        [scaled_image_data writeToFile:file_path atomically:YES];
     }
     
-    return [UIImage imageNamed:file_name];
+    NSString* relative_file_path = [self filePathWithSize:size andQuality:quality relative:YES];
+    
+    return [UIImage imageNamed:relative_file_path];
 }
 
 - (NSString*)fileNameWithSize:(CGSize)size andQuality:(float)quality
@@ -234,13 +232,15 @@ const float default_quality = 0.5;
     return [NSString stringWithFormat:@"id-%dwidth-%fheight-%fquality-%f.jpg", uniquie_id, size.width, size.height, quality];
 }
 
-- (NSString*)fileName
+- (NSString*)filePathWithSize:(CGSize)size andQuality:(float)quality relative:(BOOL)relative
 {
-    NSLog(@"file size: %d", [UIImageJPEGRepresentation([self smallSizeWithQuality:0.001], 0.001) length]);
+    NSString* file_path = [tmp_folder_path stringByAppendingPathComponent:[self fileNameWithSize:size andQuality:quality]];
+    if (relative) {
+        NSString* root_path = [[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent];
+        file_path = [file_path stringByReplacingOccurrencesOfString:root_path withString:@".."];
+    }
     
-    CGSize smallSize = CGSizeMake(small_width, small_width * full_Size.height / full_Size.width);
-    
-    return [self fileNameWithSize:smallSize andQuality:default_quality];
+    return file_path;
 }
 
 - (NSString*)cacheForReuse
@@ -262,6 +262,9 @@ const float default_quality = 0.5;
         if (!image_data) {
             return Nil;
         }
+        
+        [[NSFileManager defaultManager] createFileAtPath:file_name
+                                                contents:nil attributes:nil];
         
         [image_data writeToFile:file_name atomically:YES];
     }
@@ -285,6 +288,8 @@ const float default_quality = 0.5;
     UIImage* response;
     
     if (file_exists) {
+        NSString* root_path = [[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent];
+        file_name = [file_name stringByReplacingOccurrencesOfString:root_path withString:@".."];
         response = [UIImage imageNamed:file_name];
     }
     
@@ -302,11 +307,7 @@ const float default_quality = 0.5;
     
     NSFileManager* filemanager = [NSFileManager defaultManager];
     
-    BOOL file_exists = [filemanager fileExistsAtPath:file_name];
-    
-    if (file_exists) {
-        [filemanager removeItemAtPath:file_name error:Nil];
-    }
+    [filemanager removeItemAtPath:file_name error:Nil];
     
     uuid_string = Nil;
 }
@@ -321,7 +322,7 @@ const float default_quality = 0.5;
 
 - (void)clearTmp
 {
-    NSString* full_sized_file_name = [tmp_folder_path stringByAppendingPathComponent:[self fileNameWithSize:full_Size andQuality:MAXIMUM_ABImage_QUALITY]];
+    NSString* full_sized_file_name = [self fileNameWithSize:full_Size andQuality:MAXIMUM_ABImage_QUALITY];
     
     NSFileManager* filemanager = [NSFileManager defaultManager];
     NSDirectoryEnumerator* en = [filemanager enumeratorAtPath:tmp_folder_path];
