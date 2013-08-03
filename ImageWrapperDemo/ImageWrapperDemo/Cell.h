@@ -6,12 +6,10 @@
 //  Copyright (c) 2013 Alexandr Barenboym. All rights reserved.
 //
 
-#import "ABImageWrapper.h"
-
 @interface Cell : UICollectionViewCell
 
 @property UIImageView* background_photo;
 
-- (void)setImage:(ABImageWrapper*)wrapper;
+- (void)setImage:(UIImage*)image;
 
 @end

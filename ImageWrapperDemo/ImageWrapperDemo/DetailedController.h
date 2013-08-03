@@ -10,4 +10,8 @@
 
 @interface DetailedController : UIViewController
 
+@property (weak, nonatomic) IBOutlet UIImageView *image;
+- (void)setImage:(UIImage*)image indexPath:(NSIndexPath*)path;
+- (IBAction)removePhoto:(id)sender;
+
 @end

@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface CollectionController : UIViewController<UICollectionViewDataSource, UICollectionViewDelegateFlowLayout>
+@interface CollectionController : UIViewController<UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIActionSheetDelegate>
 
 @property (weak, nonatomic) IBOutlet UICollectionView *collection;
 

@@ -8,8 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-@interface DataModel : NSMutableDictionary
+NSMutableDictionary* dataModel();
 
-+ (id)instance;
-
-@end
+NSString* keyForIndexPath(NSIndexPath* path);

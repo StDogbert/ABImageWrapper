@@ -8,50 +8,20 @@
 
 #import "DataModel.h"
 
-@implementation DataModel
+static NSMutableDictionary* instance;
 
-static DataModel* instance;
 
-+ (id)instance
+NSMutableDictionary* dataModel()
 {
     if (!instance) {
-        instance = [[DataModel alloc] init];
+        instance = [[NSMutableDictionary alloc] init];
     }
     
     return instance;
 }
 
-#pragma mark - NSDictionary subclass methods
-- (NSUInteger)count
+NSString* keyForIndexPath(NSIndexPath* path)
 {
-    return [super count];
+    return [NSString stringWithFormat:@"%d", path.row];
 }
 
-- (id)initWithObjects:(NSArray *)objects forKeys:(NSArray *)keys
-{
-    return [super initWithObjects:objects forKeys:keys];
-}
-
-- (id)objectForKey:(id)aKey
-{
-    return [super objectForKey:aKey];
-}
-
-- (NSEnumerator *)keyEnumerator
-{
-    return [super keyEnumerator];
-}
-
-
-#pragma mark - NSMutableDictionary subclass methods
-- (void)setObject:(id)anObject forKey:(id < NSCopying >)aKey
-{
-    [super setObject:anObject forKey:aKey];
-}
-
-- (void)removeObjectForKey:(id)aKey
-{
-    [super removeObjectForKey:aKey];
-}
-
-@end

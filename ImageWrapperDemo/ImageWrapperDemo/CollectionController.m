@@ -81,7 +81,7 @@ UIViewController* getViewControllerWithID(NSString* controller_id)
 #pragma mark - UICollectionView Datasource
 - (NSInteger)collectionView:(UICollectionView *)view numberOfItemsInSection:(NSInteger)section
 {
-    return 1;
+    return 50;
 }
 
 - (NSInteger)numberOfSectionsInCollectionView: (UICollectionView *)collectionView
@@ -93,10 +93,14 @@ UIViewController* getViewControllerWithID(NSString* controller_id)
 {
     NSString* identifier = @"cell";
     Cell *cell = [cv dequeueReusableCellWithReuseIdentifier:identifier forIndexPath:indexPath];
-    NSString* image_name = [NSString stringWithFormat:@"nature%d.jpg", indexPath.row%4+1];
-    UIImage* image = [UIImage imageNamed:image_name];
-    ABImageWrapper* wrapper = [ABImageWrapper createWithUIImage:image];
-    [cell setImage:wrapper];
+    
+    NSString* key = keyForIndexPath(indexPath);
+    
+    NSMutableDictionary* data = dataModel();
+    
+    ABImageWrapper* wrapper = [data valueForKey:key];
+    
+    [cell setImage:[wrapper mediumSize]];
     
     return cell;
 }
@@ -104,10 +108,23 @@ UIViewController* getViewControllerWithID(NSString* controller_id)
 #pragma mark - UICollectionViewDelegate
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    DetailedController* controller = (DetailedController*)getViewControllerWithID(@"detailed");
-    [self.navigationController pushViewController:controller animated:YES];
+    NSString* key = keyForIndexPath(indexPath);
+    NSMutableDictionary* data = dataModel();
+    ABImageWrapper* wrapper = [data valueForKey:key];
     
-    [collectionView deselectItemAtIndexPath:indexPath animated:YES];
+    if (wrapper) {
+        DetailedController* controller = (DetailedController*)getViewControllerWithID(@"detailed");
+        [self.navigationController pushViewController:controller animated:YES];
+        [controller setImage:[wrapper fullSized] indexPath:indexPath];
+        
+        [collectionView deselectItemAtIndexPath:indexPath animated:YES];
+    }
+    else
+    {
+        UIActionSheet* popupQuery = [[UIActionSheet alloc] initWithTitle:Nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:Nil otherButtonTitles:@"Camera", @"Photo Library", nil];
+        
+        [popupQuery showInView:self.view];
+    }
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didDeselectItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -129,7 +146,77 @@ UIViewController* getViewControllerWithID(NSString* controller_id)
     return UIEdgeInsetsMake(10, 20, 10, 20);
 }
 
+#pragma mark - # UIImagePicker Controller delegate
+- (void) imagePickerController:(UIImagePickerController*)picker didFinishPickingMediaWithInfo:(NSDictionary*)info
+{
+	// Access the uncropped image from info dictionary
+    UIImage* image = [info objectForKey:@"UIImagePickerControllerOriginalImage"];
+    
+    ABImageWrapper* wrapper = [ABImageWrapper createWithUIImage:image];
+    
+    NSIndexPath* path = [[self.collection indexPathsForSelectedItems] lastObject];
+    
+    NSString* key = keyForIndexPath(path);
+    NSMutableDictionary* data = dataModel();
+    [data setValue:wrapper forKey:key];
+    
+    [self stopUIImagePicker];
+}
 
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
+{
+    [self stopUIImagePicker];
+}
 
+- (void)stopUIImagePicker
+{
+    NSIndexPath* path = [[self.collection indexPathsForSelectedItems] lastObject];
+    [self.collection deselectItemAtIndexPath:path animated:YES];
+    
+    //Take image picker off the screen (required)
+	[self dismissViewControllerAnimated:YES completion:^(void){}];
+}
+
+#pragma mark - UIActionSheetDelegate
+-(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    NSIndexPath* path;
+    
+    switch (buttonIndex) {
+        case 0:
+            [self presentImagePicker:YES];
+            break;
+        case 1:
+            [self presentImagePicker:NO];
+            break;
+        case 2:
+            path = [[self.collection indexPathsForSelectedItems] lastObject];
+            [self.collection deselectItemAtIndexPath:path animated:YES];
+        default:
+            break;
+    }
+}
+
+- (void)presentImagePicker:(BOOL)camera
+{
+    UIImagePickerController* imagePicker = [[UIImagePickerController alloc] init];
+    [imagePicker setSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
+    
+    if (camera) {
+        if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
+        {
+            [imagePicker setSourceType:UIImagePickerControllerSourceTypeCamera];
+        }
+    }
+    
+    // Delegate is self
+	imagePicker.delegate = self;
+    
+    // Allow editing of image ?
+    //	imagePicker.allowsEditing = YES;
+    
+    // Show image picker
+	[self presentViewController:imagePicker animated:YES completion:^(void){}];
+}
 
 @end

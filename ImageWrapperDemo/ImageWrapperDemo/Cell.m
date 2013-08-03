@@ -52,9 +52,9 @@
     return self;
 }
 
-- (void)setImage:(ABImageWrapper*)wrapper
+- (void)setImage:(UIImage*)image
 {
-    self.background_photo.image = [wrapper mediumSize];
+    self.background_photo.image = image;
 }
 
 @end
