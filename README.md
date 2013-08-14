@@ -9,9 +9,11 @@ Usage example:
 //Create wrapper. You don't need to keep your image after wrapper is created 
 ABImageWrapper* wrapper = [ABImageWrapper createWithUIImage:image];
 
-//Get your original image UIImage* full_sized_image = [wrapper fullSized];
+//Get your original image 
+UIImage* full_sized_image = [wrapper fullSized];
 
-//Scaled image for some previews UIImage* small_image = [wrapper smallSize];
+//Scaled image for some previews 
+UIImage* small_image = [wrapper smallSize];
 
 //128 128 image with quality of 0.5. Quality parameter is used for UIImageJPEGRepresentation 
 UIImage* custom_image = [wrapper customSize:CGSizeMake(128, 128) withQuality:0.5];
